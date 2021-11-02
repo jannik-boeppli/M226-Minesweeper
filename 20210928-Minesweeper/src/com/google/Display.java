@@ -54,7 +54,7 @@ public class Display extends JFrame implements MouseListener {
             }
         });
     }
-    
+
     public void generateField() {
         Random random = new Random();
         for (int i = 0; i < amountBombs; i++) {
@@ -193,6 +193,27 @@ public class Display extends JFrame implements MouseListener {
         return new int[]{r.height, r.width};
     }
 
+    public void leftClick(int y, int x) {
+        if (!flagGrid[y][x] && buttons[y][x].getText().equals("")) {
+            if (grid[y][x] == 0) {
+                buttons[y][x].setText(" ");
+                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkBrown : lightBrown);
+            } else if (grid[y][x] == BOMB) {
+                gameOver();
+            } else {
+                buttons[y][x].setText(grid[y][x] + "");
+                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkBrown : lightBrown);
+            }
+        }
+    }
+
+    public void gameOver() {
+    }
+
+
+    public void restartGame() {
+
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -201,6 +222,38 @@ public class Display extends JFrame implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.getSource() == resetButton) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                restartGame();
+            }
+        } else {
+            boolean foundButton = false;
+            for (int y = 0; y < grid.length; y++) {
+                for (int x = 0; x < grid[0].length; x++) {
+                    if (e.getSource() == buttons[y][x]) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            leftClick(y, x);
+                        } else if (SwingUtilities.isRightMouseButton(e)) {
+                            rightClick(y, x);
+                        } else if (SwingUtilities.isMiddleMouseButton(e)) {
+                            middleClick(y, x);
+                        }
+                        foundButton = true;
+                        break;
+                    }
+                }
+                if (foundButton) {
+                    break;
+                }
+            }
+        }
+    }
+
+    public void rightClick(int y, int x) {
+
+    }
+
+    public void middleClick(int yPosition, int xPosition) {
 
     }
 
