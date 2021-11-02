@@ -19,27 +19,16 @@ public class Display extends JFrame implements MouseListener {
 
     Display(int width, int height, int sizeX, int sizeY, int amountBombs) {
         //Set min values
-        if (sizeX < 3) {
-            sizeX = 3;
-        }
-        if (sizeY < 3) {
-            sizeY = 3;
-        }
-        if (amountBombs < 1) {
-            amountBombs = 1;
-        }
-        while (sizeX * sizeY < amountBombs * 2) {
-            amountBombs /= 2;
-        }
+        sizeX = minSize(sizeX);
+        sizeY = minSize(sizeY);
+        this.amountBombs = minMaxAmountBombs(sizeX, sizeY, amountBombs);
 
         resetButton = new JButton();
         label = new JLabel();
-        this.amountBombs = amountBombs;
 
         flagGrid = new boolean[sizeY][sizeX];
         grid = new int[sizeY][sizeX];
         createButtons();
-        //    buttons = new JButton[sizeY][sizeX];
 
         manager();
     }
@@ -69,27 +58,46 @@ public class Display extends JFrame implements MouseListener {
         }
     }
 
-    public int getBombs(int y, int x){
-        if(grid[y][x] == BOMB){
+    public int getBombs(int y, int x) {
+        if (grid[y][x] == BOMB) {
             return BOMB;
         }
         int counter = 0;
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if(j == 0 && i == 0){
+                if (j == 0 && i == 0) {
                     continue;
                 }
-
-////jlksdjflökasjdflökasjdjasdlökfjasfjlks
-                //count
+                if (y + i < 0 || y + i >= grid.length) {
+                    continue;
+                }
+                if (x + j < 0 || x + j >= grid[0].length) {
+                    continue;
+                }
+                if (grid[y + i][x + j] == BOMB) {
+                    counter++;
+                }
             }
         }
-
-
         return counter;
     }
 
+    public int minSize(int var) {
+        if (var < 3) {
+            var = 3;
+        }
+        return var;
+    }
 
+    public int minMaxAmountBombs(int x, int y, int var) {
+        if (var < 1) {
+            var = 1;
+        }
+        while (x * y < var * 2) {
+            var /= 2;
+        }
+        return var;
+    }
 
     public void createButtons() {
 
