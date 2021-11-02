@@ -11,6 +11,7 @@ public class Display extends JFrame implements MouseListener {
     private JLabel label;
     private int amountBombs;
     private boolean loadGrid;
+    private boolean gameIsOver;
 
     private String flagIcon = "🚩";
     private String bombIcon = "B";
@@ -32,6 +33,7 @@ public class Display extends JFrame implements MouseListener {
         sizeX = minSize(sizeX);
         sizeY = minSize(sizeY);
         this.amountBombs = minMaxAmountBombs(sizeX, sizeY, amountBombs);
+        gameIsOver = false;
 
         //create new objects
         this.resetButton = new JButton();
@@ -47,16 +49,21 @@ public class Display extends JFrame implements MouseListener {
     //manager
     public void manager(int width, int height) {
         createButtons();
+        createLabel();
         generateDisplay(width, height);
         setListener();
     }
 
     public void setPosition() {
         setButtonPosition();
-
+        setLabelPosition();
     }
 
-    //Erweitern
+    public void setLabelPosition() {
+        label.setBounds((int) (getBoundSize()[1] * 0.05), (int) (getBoundSize()[0] * 0.02),
+                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
+    }
+
     public void gameOver() {
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
@@ -65,6 +72,8 @@ public class Display extends JFrame implements MouseListener {
                 }
             }
         }
+        gameIsOver = true;
+        label.setText("Game Over");
     }
 
     public void winCheck() {
@@ -80,6 +89,8 @@ public class Display extends JFrame implements MouseListener {
         }
         if (finished) {
             System.out.println("game finished");
+            label.setText("You won");
+            gameIsOver = true;
         }
     }
 
@@ -95,6 +106,8 @@ public class Display extends JFrame implements MouseListener {
             }
         }
         loadGrid = false;
+        label.setText("");
+        gameIsOver = false;
     }
 
     //Working
@@ -246,6 +259,21 @@ public class Display extends JFrame implements MouseListener {
         this.add(resetButton);
     }
 
+    public void createLabel() {
+        label = new JLabel();
+        label.setFocusable(false);
+        label.setVisible(true);
+
+        label.setBorder(null);
+        label.setFont(new Font("MV Boli", Font.BOLD, 25));
+        label.setBackground(Color.ORANGE);
+
+        label.setBounds((int) (getBoundSize()[1] * 0.05), (int) (getBoundSize()[0] * 0.02),
+                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
+
+        this.add(label);
+    }
+
     public void setButtonPosition() {
         final double fieldXSize = 0.98 / grid[0].length;
         final double fieldYSize = 0.78 / grid.length;
@@ -305,7 +333,7 @@ public class Display extends JFrame implements MouseListener {
     public void setListener() {
         this.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                setButtonPosition();
+                setPosition();
             }
         });
     }
@@ -352,7 +380,8 @@ public class Display extends JFrame implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -360,7 +389,7 @@ public class Display extends JFrame implements MouseListener {
             if (SwingUtilities.isLeftMouseButton(e)) {
                 restartGame();
             }
-        } else {
+        } else if (!gameIsOver) {
             boolean foundButton = false;
             for (int y = 0; y < grid.length; y++) {
                 for (int x = 0; x < grid[0].length; x++) {
