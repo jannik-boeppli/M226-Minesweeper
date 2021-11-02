@@ -13,6 +13,9 @@ public class Display extends JFrame implements MouseListener {
     private JLabel label;
     private int amountBombs;
 
+    private String flagIcon = "🚩";
+    private String bombIcon = "B";
+
     private boolean[][] flagGrid;
     private int[][] grid;
     private JButton[][] buttons;
@@ -199,6 +202,7 @@ public class Display extends JFrame implements MouseListener {
                 buttons[y][x].setText(" ");
                 buttons[y][x].setBackground((y + x) % 2 == 0 ? darkBrown : lightBrown);
             } else if (grid[y][x] == BOMB) {
+                buttons[y][x].setText(bombIcon);
                 gameOver();
             } else {
                 buttons[y][x].setText(grid[y][x] + "");
@@ -207,12 +211,53 @@ public class Display extends JFrame implements MouseListener {
         }
     }
 
-    public void gameOver() {
+    public void rightClick(int y, int x) {
+        if (buttons[y][x].getText().equals("") || buttons[y][x].getText().equals(flagIcon)) {
+            if (!flagGrid[y][x]) {
+                buttons[y][x].setText(flagIcon);
+                flagGrid[y][x] = true;
+            } else {
+                buttons[y][x].setText("");
+                flagGrid[y][x] = false;
+            }
+        }
     }
 
+    public void middleClick(int yPosition, int xPosition) {
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                //Check if position is in bound
+                if (isInBound(yPosition + y, xPosition + x)) {
+                    leftClick(yPosition + y, xPosition + x);
+                }
+            }
+        }
+    }
+
+    public void gameOver() {
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                if (grid[y][x] == BOMB) {
+                    buttons[y][x].setText(bombIcon);
+                }
+            }
+        }
+    }
 
     public void restartGame() {
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[0].length; x++) {
+                buttons[y][x].setText("");
+                flagGrid[y][x] = false;
+                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkGreen : lightGreen);
+                buttons[y][x].setBorder(null);
+                grid[y][x] = 0;
+            }
+        }
+    }
 
+    public boolean isInBound(int y, int x) {
+        return (y >= 0 && y < grid.length && x >= 0 && x < grid[0].length);
     }
 
     @Override
@@ -247,14 +292,6 @@ public class Display extends JFrame implements MouseListener {
                 }
             }
         }
-    }
-
-    public void rightClick(int y, int x) {
-
-    }
-
-    public void middleClick(int yPosition, int xPosition) {
-
     }
 
     @Override
