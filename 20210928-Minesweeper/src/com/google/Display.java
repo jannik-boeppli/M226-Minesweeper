@@ -15,6 +15,11 @@ public class Display extends JFrame implements MouseListener {
     private int[][] grid;
     private JButton[][] buttons;
 
+    private Color lightGreen = new Color(170, 215, 81);
+    private Color darkGreen = new Color(124, 164, 60);
+    private Color lightBrown = new Color(229, 194, 159);
+    private Color darkBrown = new Color(215, 184, 153);
+
     private final int BOMB = 10;
 
     Display(int width, int height, int sizeX, int sizeY, int amountBombs) {
@@ -23,18 +28,20 @@ public class Display extends JFrame implements MouseListener {
         sizeY = minSize(sizeY);
         this.amountBombs = minMaxAmountBombs(sizeX, sizeY, amountBombs);
 
-        resetButton = new JButton();
-        label = new JLabel();
+        //create new objects
+        this.resetButton = new JButton();
+        this.label = new JLabel();
+        this.flagGrid = new boolean[sizeY][sizeX];
+        this.grid = new int[sizeY][sizeX];
+        this.buttons = new JButton[sizeY][sizeX];
 
-        flagGrid = new boolean[sizeY][sizeX];
-        grid = new int[sizeY][sizeX];
-        createButtons();
-
-        manager();
+        manager(width,height);
     }
 
-    public void manager() {
+    public void manager(int width, int height) {
         generateField();
+        createButtons();
+        generateDisplay(width, height);
     }
 
     public void generateField() {
@@ -99,8 +106,58 @@ public class Display extends JFrame implements MouseListener {
         return var;
     }
 
-    public void createButtons() {
+    public void generateDisplay(int width, int height) {
+        this.setSize(width, height);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(null);
+        this.setVisible(true);
+        this.setMinimumSize(new Dimension(width, height));
+        this.getContentPane().setBackground(new Color(68, 84, 31));
+    }
 
+    public void createButtons() {
+        final double fieldXSize = 0.98 / grid[0].length;
+        final double fieldYSize = 0.78 / grid.length;
+        double positionY = 0.15;
+        for (int y = 0; y < grid.length; y++) {
+            double positionX = 0;
+            for (int x = 0; x < grid[0].length; x++) {
+                buttons[y][x] = new JButton();
+
+                buttons[y][x].addMouseListener(this);
+                buttons[y][x].setFocusable(false);
+                buttons[y][x].setVisible(true);
+
+                buttons[y][x].setBorder(null);
+                buttons[y][x].setFont(new Font("MV Boli", Font.BOLD, 25));
+                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkGreen : lightGreen);
+
+                buttons[y][x].setMargin(new Insets(0, 0, 0, 0));
+                buttons[y][x].setBounds((int) (getBoundSize()[1] * positionX), (int) (getBoundSize()[0] * positionY),
+                        (int) (getBoundSize()[1] * fieldXSize), (int) (getBoundSize()[0] * fieldYSize));
+
+                this.add(buttons[y][x]);
+
+                positionX += fieldXSize;
+            }
+            positionY += fieldYSize;
+        }
+        resetButton = new JButton();
+        resetButton.addMouseListener(this);
+        resetButton.setFocusable(false);
+        resetButton.setVisible(true);
+
+        resetButton.setBorder(null);
+        resetButton.setFont(new Font("MV Boli", Font.BOLD, 25));
+        resetButton.setBackground(lightGreen);
+
+        resetButton.setMargin(new Insets(0, 0, 0, 0));
+        resetButton.setBounds((int) (getBoundSize()[1] * 0.65), (int) (getBoundSize()[0] * 0.02),
+                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
+
+        resetButton.setText("Restart");
+
+        this.add(resetButton);
     }
 
     public int[] getBoundSize() {
