@@ -2,6 +2,8 @@ package com.google;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
@@ -42,8 +44,17 @@ public class Display extends JFrame implements MouseListener {
         generateField();
         createButtons();
         generateDisplay(width, height);
+        setListener();
     }
 
+    public void setListener() {
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                setButtonPosition();
+            }
+        });
+    }
+    
     public void generateField() {
         Random random = new Random();
         for (int i = 0; i < amountBombs; i++) {
@@ -113,6 +124,23 @@ public class Display extends JFrame implements MouseListener {
         this.setVisible(true);
         this.setMinimumSize(new Dimension(width, height));
         this.getContentPane().setBackground(new Color(68, 84, 31));
+    }
+
+    public void setButtonPosition() {
+        final double fieldXSize = 0.98 / grid[0].length;
+        final double fieldYSize = 0.78 / grid.length;
+        double positionY = 0.15;
+        for (int y = 0; y < grid.length; y++) {
+            double positionX = 0;
+            for (int x = 0; x < grid[0].length; x++) {
+                buttons[y][x].setBounds((int) (getBoundSize()[1] * positionX), (int) (getBoundSize()[0] * positionY),
+                        (int) (getBoundSize()[1] * fieldXSize), (int) (getBoundSize()[0] * fieldYSize));
+                positionX += fieldXSize;
+            }
+            positionY += fieldYSize;
+        }
+        resetButton.setBounds((int) (getBoundSize()[1] * 0.65), (int) (getBoundSize()[0] * 0.02),
+                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
     }
 
     public void createButtons() {
