@@ -6,6 +6,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 
+import static com.google.DefaultValues.*;
+import static com.google.Helper.*;
+
 public class Display extends JFrame implements MouseListener {
     private JButton resetButton;
     private JLabel label;
@@ -13,27 +16,17 @@ public class Display extends JFrame implements MouseListener {
     private boolean loadGrid;
     private boolean gameIsOver;
 
-    private String flagIcon = "🚩";
-    private String bombIcon = "B";
-
-    private Color lightGreen = new Color(170, 215, 81);
-    private Color darkGreen = new Color(124, 164, 60);
-    private Color lightBrown = new Color(229, 194, 159);
-    private Color darkBrown = new Color(215, 184, 153);
-
     private boolean[][] revealGrid;
     private boolean[][] flagGrid;
     private int[][] grid;
     private JButton[][] buttons;
 
-    private final int BOMB = 9;
 
     Display(int width, int height, int sizeX, int sizeY, int amountBombs) {
         //Set min values
         sizeX = minSize(sizeX);
         sizeY = minSize(sizeY);
         this.amountBombs = minMaxAmountBombs(sizeX, sizeY, amountBombs);
-        gameIsOver = false;
 
         //create new objects
         this.resetButton = new JButton();
@@ -48,32 +41,35 @@ public class Display extends JFrame implements MouseListener {
 
     //manager
     public void manager(int width, int height) {
-        createButtons();
-        createLabel();
-        generateDisplay(width, height);
+        Generator generator = new Generator();
+        generator.createButtons(this, this);
+        generator.createLabel(this);
+        generator.generateDisplay(this, width, height);
         setListener();
     }
+
 
     public void setPosition() {
         setButtonPosition();
         setLabelPosition();
     }
 
-    public void setLabelPosition() {
-        label.setBounds((int) (getBoundSize()[1] * 0.05), (int) (getBoundSize()[0] * 0.02),
-                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
-    }
 
     public void gameOver() {
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
                 if (grid[y][x] == BOMB) {
-                    buttons[y][x].setText(bombIcon);
+                    buttons[y][x].setText(BOMB_ICON);
                 }
             }
         }
         gameIsOver = true;
         label.setText("Game Over");
+    }
+
+    public void setLabelPosition() {
+        label.setBounds((int) (getBoundSize(this)[1] * 0.05), (int) (getBoundSize(this)[0] * 0.02),
+                (int) (getBoundSize(this)[1] * 0.25), (int) (getBoundSize(this)[0] * 0.1));
     }
 
     public void winCheck() {
@@ -89,8 +85,6 @@ public class Display extends JFrame implements MouseListener {
         }
         if (finished) {
             System.out.println("game finished");
-            label.setText("You won");
-            gameIsOver = true;
         }
     }
 
@@ -100,7 +94,7 @@ public class Display extends JFrame implements MouseListener {
                 buttons[y][x].setText("");
                 flagGrid[y][x] = false;
                 revealGrid[y][x] = false;
-                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkGreen : lightGreen);
+                buttons[y][x].setBackground((y + x) % 2 == 0 ? DARK_GREEN : LIGHT_GREEN);
                 buttons[y][x].setBorder(null);
                 grid[y][x] = 0;
             }
@@ -116,22 +110,22 @@ public class Display extends JFrame implements MouseListener {
             for (int x = 0; x < grid[0].length; x++) {
                 if (revealGrid[y][x]) {
                     byte[] borderValue = new byte[4];
-                    if (isInBound(y - 1, x) && !revealGrid[y - 1][x]) {
+                    if (isInBound(grid, y - 1, x) && !revealGrid[y - 1][x]) {
                         borderValue[0] = 3;
                     } else {
                         borderValue[0] = 0;
                     }
-                    if (isInBound(y, x - 1) && !revealGrid[y][x - 1]) {
+                    if (isInBound(grid, y, x - 1) && !revealGrid[y][x - 1]) {
                         borderValue[1] = 3;
                     } else {
                         borderValue[1] = 0;
                     }
-                    if (isInBound(y + 1, x) && !revealGrid[y + 1][x]) {
+                    if (isInBound(grid, y + 1, x) && !revealGrid[y + 1][x]) {
                         borderValue[2] = 3;
                     } else {
                         borderValue[2] = 0;
                     }
-                    if (isInBound(y, x + 1) && !revealGrid[y][x + 1]) {
+                    if (isInBound(grid, y, x + 1) && !revealGrid[y][x + 1]) {
                         borderValue[3] = 3;
                     } else {
                         borderValue[3] = 0;
@@ -144,190 +138,35 @@ public class Display extends JFrame implements MouseListener {
         }
     }
 
-    public void leftClick(int y, int x) {
-        if (!flagGrid[y][x] && buttons[y][x].getText().equals("")) {
-            if (grid[y][x] == 0) {
-                buttons[y][x].setText(" ");
-                revealSurrounding(y, x);
-                revealGrid[y][x] = true;
-                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkBrown : lightBrown);
-            } else if (grid[y][x] == BOMB) {
-                buttons[y][x].setText(bombIcon);
-                gameOver();
-            } else {
-                revealGrid[y][x] = true;
-                buttons[y][x].setText(grid[y][x] + "");
-                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkBrown : lightBrown);
-            }
-        }
-    }
 
-    public void revealSurrounding(int yPosition, int xPosition) {
+    public void revealSurrounding(ClickHandler clickHandler, int yPosition, int xPosition) {
         for (int y = -1; y <= 1; y++) {
             for (int x = -1; x <= 1; x++) {
                 //Check if position is in bound
-                if (isInBound(yPosition + y, xPosition + x)) {
-                    leftClick(yPosition + y, xPosition + x);
+                if (isInBound(grid, yPosition + y, xPosition + x)) {
+                    clickHandler.leftClick(this, yPosition + y, xPosition + x);
                 }
             }
         }
-    }
-
-    public boolean isInBound(int y, int x) {
-        return (y >= 0 && y < grid.length && x >= 0 && x < grid[0].length);
-    }
-
-    public void rightClick(int y, int x) {
-        if (buttons[y][x].getText().equals("") || buttons[y][x].getText().equals(flagIcon)) {
-            if (!flagGrid[y][x]) {
-                buttons[y][x].setText(flagIcon);
-                flagGrid[y][x] = true;
-            } else {
-                buttons[y][x].setText("");
-                flagGrid[y][x] = false;
-            }
-        }
-    }
-
-    public void middleClick(int yPosition, int xPosition) {
-        int counter = 0;
-        for (int y = -1; y <= 1; y++) {
-            for (int x = -1; x <= 1; x++) {
-                if (isInBound(yPosition + y, xPosition + x)) {
-                    if (flagGrid[yPosition + y][xPosition + x]) {
-                        counter++;
-                    }
-                }
-            }
-        }
-        if (counter == grid[yPosition][xPosition]) {
-            revealSurrounding(yPosition, xPosition);
-        }
-    }
-
-    public void generateDisplay(int width, int height) {
-        this.setSize(width, height);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(null);
-        this.setVisible(true);
-        this.setMinimumSize(new Dimension(width, height));
-        this.getContentPane().setBackground(new Color(68, 84, 31));
-    }
-
-    public void createButtons() {
-        final double fieldXSize = 0.98 / grid[0].length;
-        final double fieldYSize = 0.78 / grid.length;
-        double positionY = 0.15;
-        for (int y = 0; y < grid.length; y++) {
-            double positionX = 0;
-            for (int x = 0; x < grid[0].length; x++) {
-                buttons[y][x] = new JButton();
-
-                buttons[y][x].addMouseListener(this);
-                buttons[y][x].setFocusable(false);
-                buttons[y][x].setVisible(true);
-
-                buttons[y][x].setBorder(null);
-                buttons[y][x].setFont(new Font("MV Boli", Font.BOLD, 25));
-                buttons[y][x].setBackground((y + x) % 2 == 0 ? darkGreen : lightGreen);
-
-                buttons[y][x].setMargin(new Insets(0, 0, 0, 0));
-                buttons[y][x].setBounds((int) (getBoundSize()[1] * positionX), (int) (getBoundSize()[0] * positionY),
-                        (int) (getBoundSize()[1] * fieldXSize), (int) (getBoundSize()[0] * fieldYSize));
-
-                this.add(buttons[y][x]);
-
-                positionX += fieldXSize;
-            }
-            positionY += fieldYSize;
-        }
-        resetButton = new JButton();
-        resetButton.addMouseListener(this);
-        resetButton.setFocusable(false);
-        resetButton.setVisible(true);
-
-        resetButton.setBorder(null);
-        resetButton.setFont(new Font("MV Boli", Font.BOLD, 25));
-        resetButton.setBackground(lightGreen);
-
-        resetButton.setMargin(new Insets(0, 0, 0, 0));
-        resetButton.setBounds((int) (getBoundSize()[1] * 0.65), (int) (getBoundSize()[0] * 0.02),
-                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
-
-        resetButton.setText("Restart");
-
-        this.add(resetButton);
-    }
-
-    public void createLabel() {
-        label = new JLabel();
-        label.setFocusable(false);
-        label.setVisible(true);
-
-        label.setBorder(null);
-        label.setFont(new Font("MV Boli", Font.BOLD, 25));
-        label.setBackground(Color.ORANGE);
-
-        label.setBounds((int) (getBoundSize()[1] * 0.05), (int) (getBoundSize()[0] * 0.02),
-                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
-
-        this.add(label);
     }
 
     public void setButtonPosition() {
         final double fieldXSize = 0.98 / grid[0].length;
         final double fieldYSize = 0.78 / grid.length;
         double positionY = 0.15;
+        int[] bounds = getBoundSize(this);
         for (int y = 0; y < grid.length; y++) {
             double positionX = 0;
             for (int x = 0; x < grid[0].length; x++) {
-                buttons[y][x].setBounds((int) (getBoundSize()[1] * positionX), (int) (getBoundSize()[0] * positionY),
-                        (int) (getBoundSize()[1] * fieldXSize), (int) (getBoundSize()[0] * fieldYSize));
+
+                buttons[y][x].setBounds((int) (bounds[1] * positionX), (int) (bounds[0] * positionY),
+                        (int) (bounds[1] * fieldXSize), (int) (bounds[0] * fieldYSize));
                 positionX += fieldXSize;
             }
             positionY += fieldYSize;
         }
-        resetButton.setBounds((int) (getBoundSize()[1] * 0.65), (int) (getBoundSize()[0] * 0.02),
-                (int) (getBoundSize()[1] * 0.25), (int) (getBoundSize()[0] * 0.1));
-    }
-
-    public int[] getBoundSize() {
-        Rectangle r = this.getBounds();
-        return new int[]{r.height, r.width};
-    }
-
-    public void generateField(int yPosition, int xPosition) {
-        Random random = new Random();
-        for (int i = 0; i < amountBombs; i++) {
-            boolean setBomb = false;
-            while (!setBomb) {
-                int x = random.nextInt(grid[0].length);
-                int y = random.nextInt(grid.length);
-                if (grid[y][x] != BOMB && !inRange(y, x, yPosition, xPosition)) {
-                    grid[y][x] = BOMB;
-                    setBomb = true;
-                }
-            }
-        }
-        for (int y = 0; y < grid.length; y++) {
-            for (int x = 0; x < grid[0].length; x++) {
-                grid[y][x] = getBombs(y, x);
-            }
-        }
-    }
-
-    public boolean inRange(int bombY, int bombX, int clickY, int clickX) {
-        boolean inRange = false;
-        for (int y = -1; y <= 1; y++) {
-            for (int x = -1; x <= 1; x++) {
-                if (isInBound(y + clickY, x + clickX)) {
-                    if (bombY == clickY + y && bombX == clickX + x) {
-                        inRange = true;
-                    }
-                }
-            }
-        }
-        return inRange;
+        resetButton.setBounds((int) (bounds[1] * 0.65), (int) (bounds[0] * 0.02),
+                (int) (bounds[1] * 0.25), (int) (bounds[0] * 0.1));
     }
 
     public void setListener() {
@@ -373,7 +212,7 @@ public class Display extends JFrame implements MouseListener {
         if (var < 1) {
             var = 1;
         }
-        while (x * y < var * 2) {
+        while (x * y <= var * 2) {
             var /= 2;
         }
         return var;
@@ -381,29 +220,32 @@ public class Display extends JFrame implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        ClickHandler clickHandler = new ClickHandler();
+        Generator generator = new Generator();
         if (e.getSource() == resetButton) {
             if (SwingUtilities.isLeftMouseButton(e)) {
                 restartGame();
             }
-        } else if (!gameIsOver) {
+        } else if(!gameIsOver){
             boolean foundButton = false;
             for (int y = 0; y < grid.length; y++) {
                 for (int x = 0; x < grid[0].length; x++) {
                     if (e.getSource() == buttons[y][x]) {
                         if (!loadGrid) {
-                            generateField(y, x);
+                            generator.generateField(this, y, x);
                             loadGrid = true;
                         }
                         if (SwingUtilities.isLeftMouseButton(e)) {
-                            leftClick(y, x);
+                            clickHandler.leftClick(this, y, x);
                         } else if (SwingUtilities.isRightMouseButton(e)) {
-                            rightClick(y, x);
+                            clickHandler.rightClick(this, y, x);
                         } else if (SwingUtilities.isMiddleMouseButton(e)) {
-                            middleClick(y, x);
+                            clickHandler.middleClick(this, y, x);
                         }
                         foundButton = true;
                         break;
@@ -431,5 +273,53 @@ public class Display extends JFrame implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public JButton[][] getButtons() {
+        return buttons;
+    }
+
+    public int[][] getGrid() {
+        return grid;
+    }
+
+    public int getAmountBombs() {
+        return amountBombs;
+    }
+
+    public JButton getResetButton() {
+        return resetButton;
+    }
+
+    public boolean[][] getRevealGrid() {
+        return revealGrid;
+    }
+
+    public void setFlagGrid(int y, int x, boolean value) {
+        flagGrid[y][x] = value;
+    }
+
+    public void setRevealGrid(int y, int x, boolean value) {
+        revealGrid[y][x] = value;
+    }
+
+    public boolean[][] getFlagGrid() {
+        return flagGrid;
+    }
+
+    public boolean isGameIsOver() {
+        return gameIsOver;
+    }
+
+    public void setGrid(int y, int x) {
+        grid[y][x] = 9;
+    }
+
+    public JLabel getLabel() {
+        return label;
+    }
+
+    public void setGameIsOver(boolean gameIsOver) {
+        this.gameIsOver = gameIsOver;
     }
 }
