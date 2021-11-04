@@ -29,7 +29,7 @@ public class Display extends JFrame implements MouseListener {
      * @param sizeY is the amount of fields in one column
      * @param amountBombs is the amount of bombs in the field
      */
-    Display(int width, int height, int sizeX, int sizeY, int amountBombs) {
+    public Display(int width, int height, int sizeX, int sizeY, int amountBombs) {
         //Set min values
         sizeX = minSize(sizeX);
         sizeY = minSize(sizeY);
@@ -46,7 +46,7 @@ public class Display extends JFrame implements MouseListener {
     }
 
     /**
-     * This methode creates the buttons labels and adds the listener
+     * This method creates the buttons labels and adds the listener
      * @param width is the width of the window
      * @param height is the height of the window
      */
@@ -206,7 +206,7 @@ public class Display extends JFrame implements MouseListener {
     }
 
     /**
-     * Adds a listener to the window, when called execute the setPosition methode
+     * Adds a listener to the window, when called execute the setPosition method
      */
     public void setListener() {
         this.addComponentListener(new ComponentAdapter() {
@@ -217,7 +217,7 @@ public class Display extends JFrame implements MouseListener {
     }
 
     /**
-     * This methode is used to get the amount of bombs around a field
+     * This method is used to get the amount of bombs around a field
      * @param y the y-position of the field to check
      * @param x the x-position of the field to check
      * @return returns the amount of bombs around the field, if field is a bomb returns  the value of the bomb
@@ -247,7 +247,7 @@ public class Display extends JFrame implements MouseListener {
     }
 
     /**
-     * This methode checks if field size is higher than 3, if not returns 3
+     * This method checks if field size is higher than 3, if not returns 3
      * @param var the value to check
      * @return returns 3 if number is lower than 3 else returns var
      */
@@ -259,7 +259,7 @@ public class Display extends JFrame implements MouseListener {
     }
 
     /**
-     * This methode checks if there is a reasonable amount of bombs in the field
+     * This method checks if there is a reasonable amount of bombs in the field
      * @param x the amount of rows of the playing field
      * @param y the amount of columns of the playing field
      * @param var the amount of bombs
@@ -356,6 +356,7 @@ public class Display extends JFrame implements MouseListener {
         return revealGrid;
     }
 
+
     public void setFlagGrid(int y, int x, boolean value) {
         flagGrid[y][x] = value;
     }
@@ -380,7 +381,4 @@ public class Display extends JFrame implements MouseListener {
         return label;
     }
 
-    public void setGameIsOver(boolean gameIsOver) {
-        this.gameIsOver = gameIsOver;
-    }
 }

@@ -9,7 +9,7 @@ import static com.google.Helper.getBoundSize;
 
 public class Generator {
     /**
-     * This methode creates all button and sets its default values
+     * This method creates all button and sets its default values
      * @param display is a reference of the object which contains the frame
      * @param mouseListener the mouse listener, which receive the actions performed (registers mouse clicks)
      */
@@ -63,7 +63,7 @@ public class Generator {
     }
 
     /**
-     * This methode creates the frame and sets its default values
+     * This method creates the frame and sets its default values
      * @param display is a reference of the object which contains the frame
      * @param width is the width, set in the main file as min width
      * @param height is the height, set in the main file as min height
@@ -78,7 +78,7 @@ public class Generator {
     }
 
     /**
-     * This methode generated the field in the background and sets its bombs
+     * This method generated the field in the background and sets its bombs
      * @param display is a reference of the object which contains the frame and the grid in the background
      * @param yPosition is the y-position of the clicked button
      * @param xPosition is the x-position of the clicked button

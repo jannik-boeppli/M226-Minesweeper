@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class ClickHandler {
     /**
-     * This methode sets a flag to the clicked field if it's not revealed,
+     * This method sets a flag to the clicked field if it's not revealed,
      * if it already is flagged than the flag is removed
      * @param display the object, which contains the frame
      * @param y the y-position of the clicked button
@@ -24,7 +24,7 @@ public class ClickHandler {
     }
 
     /**
-     * This methode checks if the amount of bombs around the field matches the amount of flags around the field
+     * This method checks if the amount of bombs around the field matches the amount of flags around the field
      * if true it reveals all fields surrounding the field
      * @param display the object which contains the frame
      * @param yPosition the y-position of the clicked button
@@ -47,7 +47,7 @@ public class ClickHandler {
     }
 
     /**
-     * This methode reveals the field of the clicked button
+     * This method reveals the field of the clicked button
      * @param display the object which contains the frame
      * @param y the y-position of the clicked button
      * @param x the x-position of the clicked button

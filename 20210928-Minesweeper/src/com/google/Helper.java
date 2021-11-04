@@ -14,7 +14,7 @@ public class Helper {
     }
 
     /**
-     * This methode checks if the bombs position is in range (one field around the clicked button)
+     * This method checks if the bombs position is in range (one field around the clicked button)
      * @param grid is the playing field, used to check if the position is in bounds
      * @param bombY the y-position of the bomb
      * @param bombX the x-position of the bomb

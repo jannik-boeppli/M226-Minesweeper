@@ -1,5 +1,7 @@
-package com.google;
+package com.google.test;
 
+import com.google.ClickHandler;
+import com.google.Display;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +33,7 @@ class ClickHandlerTest {
     }
 
     /**
-     * checks if the game over methode is working
+     * checks if the game over implementation is working
      */
     @Test
     void clickOnBomb_GameOver() {
@@ -39,4 +41,12 @@ class ClickHandlerTest {
         assertTrue(display.isGameIsOver());
     }
 
+    /**
+     * checks if the left click methode works
+     */
+    @Test
+    void leftClick() {
+        clickHandler.rightClick(display, 7,7);
+        assertTrue(display.getFlagGrid()[7][7]);
+    }
 }
