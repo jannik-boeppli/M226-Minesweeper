@@ -8,6 +8,11 @@ import java.util.Random;
 import static com.google.Helper.getBoundSize;
 
 public class Generator {
+    /**
+     * This methode creates all button and sets its default values
+     * @param display is a reference of the object which contains the frame
+     * @param mouseListener the mouse listener, which receive the actions performed (registers mouse clicks)
+     */
     public void createButtons(Display display, MouseListener mouseListener) {
         int [][] grid = display.getGrid();
         final double fieldXSize = 0.98 / grid[0].length;
@@ -57,6 +62,12 @@ public class Generator {
         display.add(resetButton);
     }
 
+    /**
+     * This methode creates the frame and sets its default values
+     * @param display is a reference of the object which contains the frame
+     * @param width is the width, set in the main file as min width
+     * @param height is the height, set in the main file as min height
+     */
     public void generateDisplay(Display display, int width, int height) {
         display.setSize(width, height);
         display.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,6 +77,12 @@ public class Generator {
         display.getContentPane().setBackground(new Color(68, 84, 31));
     }
 
+    /**
+     * This methode generated the field in the background and sets its bombs
+     * @param display is a reference of the object which contains the frame and the grid in the background
+     * @param yPosition is the y-position of the clicked button
+     * @param xPosition is the x-position of the clicked button
+     */
     public void generateField(Display display, int yPosition, int xPosition) {
         Random random = new Random();
         for (int i = 0; i < display.getAmountBombs(); i++) {
@@ -85,6 +102,11 @@ public class Generator {
             }
         }
     }
+
+    /**
+     * Created a label and sets its default values
+     * @param display is a reference of the object which contains the frame
+     */
     public void createLabel(Display display) {
         JLabel label = display.getLabel();
         label.setFocusable(false);

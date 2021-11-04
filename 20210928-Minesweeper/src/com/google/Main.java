@@ -2,7 +2,7 @@ package com.google;
 
 public class Main {
     public static void main(String[] args) {
-        new Display(500, 550, 10, 8, 99);
+        new Display(500, 550, 10, 8, 1);
     }
 }
 //Easy: 10*8 -> 10              10, 8, 10

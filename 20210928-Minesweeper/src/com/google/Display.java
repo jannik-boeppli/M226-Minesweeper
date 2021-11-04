@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Random;
 
 import static com.google.DefaultValues.*;
 import static com.google.Helper.*;
@@ -21,7 +20,15 @@ public class Display extends JFrame implements MouseListener {
     private int[][] grid;
     private JButton[][] buttons;
 
-
+    /**
+     * This is the constructor, which is called from the main, in it the default values are set
+     * and the manager is called
+     * @param width is the window width when started
+     * @param height is the window height when started
+     * @param sizeX is the amount of fields in one row
+     * @param sizeY is the amount of fields in one column
+     * @param amountBombs is the amount of bombs in the field
+     */
     Display(int width, int height, int sizeX, int sizeY, int amountBombs) {
         //Set min values
         sizeX = minSize(sizeX);
@@ -35,11 +42,14 @@ public class Display extends JFrame implements MouseListener {
         this.flagGrid = new boolean[sizeY][sizeX];
         this.grid = new int[sizeY][sizeX];
         this.buttons = new JButton[sizeY][sizeX];
-
         manager(width, height);
     }
 
-    //manager
+    /**
+     * This methode creates the buttons labels and adds the listener
+     * @param width is the width of the window
+     * @param height is the height of the window
+     */
     public void manager(int width, int height) {
         Generator generator = new Generator();
         generator.createButtons(this, this);
@@ -48,13 +58,10 @@ public class Display extends JFrame implements MouseListener {
         setListener();
     }
 
-
-    public void setPosition() {
-        setButtonPosition();
-        setLabelPosition();
-    }
-
-
+    /**
+     * Gets called when the player clicks on a bomb,
+     * disables playing field, a game over text is shown and reveals all bombs
+     */
     public void gameOver() {
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
@@ -67,11 +74,10 @@ public class Display extends JFrame implements MouseListener {
         label.setText("Game Over");
     }
 
-    public void setLabelPosition() {
-        label.setBounds((int) (getBoundSize(this)[1] * 0.05), (int) (getBoundSize(this)[0] * 0.02),
-                (int) (getBoundSize(this)[1] * 0.25), (int) (getBoundSize(this)[0] * 0.1));
-    }
-
+    /**
+     * Gets called when all fields are revealed except the bombs,
+     * the buttons get disabled, a winning text is shown
+     */
     public void winCheck() {
         boolean finished = true;
         for (int y = 0; y < grid.length; y++) {
@@ -84,10 +90,14 @@ public class Display extends JFrame implements MouseListener {
             }
         }
         if (finished) {
-            System.out.println("game finished");
+            label.setText("You won");
+            gameIsOver = true;
         }
     }
 
+    /**
+     * The game gets restarted, the background color is reset, the buttons get activated
+     */
     public void restartGame() {
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
@@ -104,7 +114,9 @@ public class Display extends JFrame implements MouseListener {
         gameIsOver = false;
     }
 
-    //Working
+    /**
+     * Sets the border between the revealed and not revealed fields
+     */
     public void setBorder() {
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[0].length; x++) {
@@ -138,7 +150,12 @@ public class Display extends JFrame implements MouseListener {
         }
     }
 
-
+    /**
+     * Reveals all buttons surrounded by the field by executing a left click on them
+     * @param clickHandler the object which contains the left click
+     * @param yPosition the y-position of the clicked field
+     * @param xPosition the x-position of the clicked field
+     */
     public void revealSurrounding(ClickHandler clickHandler, int yPosition, int xPosition) {
         for (int y = -1; y <= 1; y++) {
             for (int x = -1; x <= 1; x++) {
@@ -150,6 +167,25 @@ public class Display extends JFrame implements MouseListener {
         }
     }
 
+    /**
+     * sets all positions of the fields on the display
+     */
+    public void setPosition() {
+        setButtonPosition();
+        setLabelPosition();
+    }
+
+    /**
+     * Sets position of label relative to the current window size
+     */
+    public void setLabelPosition() {
+        label.setBounds((int) (getBoundSize(this)[1] * 0.05), (int) (getBoundSize(this)[0] * 0.02),
+                (int) (getBoundSize(this)[1] * 0.25), (int) (getBoundSize(this)[0] * 0.1));
+    }
+
+    /**
+     * Sets position all buttons relative to the current window size
+     */
     public void setButtonPosition() {
         final double fieldXSize = 0.98 / grid[0].length;
         final double fieldYSize = 0.78 / grid.length;
@@ -169,6 +205,9 @@ public class Display extends JFrame implements MouseListener {
                 (int) (bounds[1] * 0.25), (int) (bounds[0] * 0.1));
     }
 
+    /**
+     * Adds a listener to the window, when called execute the setPosition methode
+     */
     public void setListener() {
         this.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
@@ -177,6 +216,12 @@ public class Display extends JFrame implements MouseListener {
         });
     }
 
+    /**
+     * This methode is used to get the amount of bombs around a field
+     * @param y the y-position of the field to check
+     * @param x the x-position of the field to check
+     * @return returns the amount of bombs around the field, if field is a bomb returns  the value of the bomb
+     */
     public int getBombs(int y, int x) {
         if (grid[y][x] == BOMB) {
             return BOMB;
@@ -201,6 +246,11 @@ public class Display extends JFrame implements MouseListener {
         return counter;
     }
 
+    /**
+     * This methode checks if field size is higher than 3, if not returns 3
+     * @param var the value to check
+     * @return returns 3 if number is lower than 3 else returns var
+     */
     public int minSize(int var) {
         if (var < 3) {
             var = 3;
@@ -208,6 +258,15 @@ public class Display extends JFrame implements MouseListener {
         return var;
     }
 
+    /**
+     * This methode checks if there is a reasonable amount of bombs in the field
+     * @param x the amount of rows of the playing field
+     * @param y the amount of columns of the playing field
+     * @param var the amount of bombs
+     * @return if the amount of bombs (var) is lower than 1 returns 1,
+     * if there are more bombs as the field size / 2 than it returns field size / 2,
+     * else it returns the amount of bombs (var)
+     */
     public int minMaxAmountBombs(int x, int y, int var) {
         if (var < 1) {
             var = 1;
@@ -218,6 +277,7 @@ public class Display extends JFrame implements MouseListener {
         return var;
     }
 
+    //mouse event
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -275,6 +335,7 @@ public class Display extends JFrame implements MouseListener {
 
     }
 
+    //getter and setter
     public JButton[][] getButtons() {
         return buttons;
     }

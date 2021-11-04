@@ -3,6 +3,13 @@ package com.google;
 import javax.swing.*;
 
 public class ClickHandler {
+    /**
+     * This methode sets a flag to the clicked field if it's not revealed,
+     * if it already is flagged than the flag is removed
+     * @param display the object, which contains the frame
+     * @param y the y-position of the clicked button
+     * @param x the x-position of the clicked button
+     */
     public void rightClick(Display display, int y, int x) {
         JButton [][] buttons = display.getButtons();
         if (buttons[y][x].getText().equals("") || buttons[y][x].getText().equals(DefaultValues.FLAG_ICON)) {
@@ -16,6 +23,13 @@ public class ClickHandler {
         }
     }
 
+    /**
+     * This methode checks if the amount of bombs around the field matches the amount of flags around the field
+     * if true it reveals all fields surrounding the field
+     * @param display the object which contains the frame
+     * @param yPosition the y-position of the clicked button
+     * @param xPosition the x-position of the clicked button
+     */
     public void middleClick(Display display, int yPosition, int xPosition) {
         int counter = 0;
         for (int y = -1; y <= 1; y++) {
@@ -32,6 +46,12 @@ public class ClickHandler {
         }
     }
 
+    /**
+     * This methode reveals the field of the clicked button
+     * @param display the object which contains the frame
+     * @param y the y-position of the clicked button
+     * @param x the x-position of the clicked button
+     */
     public void leftClick(Display display, int y, int x) {
         if (!display.getFlagGrid()[y][x] && display.getButtons()[y][x].getText().equals("")) {
             if (display.getGrid()[y][x] == 0) {
